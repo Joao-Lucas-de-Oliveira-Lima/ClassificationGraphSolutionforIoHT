@@ -5,72 +5,64 @@ from utils import cesarDecriptor
 
 connection = None
 connection_db = None
-db_name = None
+db_name = "db"  # nome do banco definido no docker-compose MYSQL_DATABASE
 
-#Connection configurations
-host_name = 'localhost' 
+# Configurações de conexão
+host_name = 'localhost'
 user_name = 'root'
-pw = cesarDecriptor('itgcv2C',2) #my pc
+password = 'secret'  # sua senha decodificada
 
-#create connection
-def create_server_connection(host_name, user_name, user_password):
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password
-        )
-        print("MySQL Database connection successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-
-    return connection
-
-###Funcions for Database
-#Create Database
-def create_database(connection, DatabaseName):
-    cursor = connection.cursor()
-    try:
-        sql  = "CREATE DATABASE "+ DatabaseName
-        cursor.execute(sql)
-        print("Database created successfully")
-    except Error as err:
-        print(f"Error: '{err}'")
-
-#Drop Database
-def drop_database(connection, DatabaseName):
-    cursor = connection.cursor()
-    try:
-        cursor.execute("DROP DATABASE "+ DatabaseName)
-        print("Database dropped successfully")
-    except Error as err:
-        print(f"Error: '{err}'")
-
-#Create DB Connection
-def create_db_connection(host_name, user_name, user_password, db_name):
+# Criar conexão com o servidor MySQL (sem banco específico)
+def create_server_connection(host_name, user_name, user_password, port=3306):
     connection = None
     try:
         connection = mysql.connector.connect(
             host=host_name,
             user=user_name,
             passwd=user_password,
-            database=db_name
+            port=port
         )
-        print("MySQL Database connection successful")
+        print("Conexão com MySQL Server bem sucedida")
     except Error as err:
-        print(f"Error: '{err}'")
-
+        print(f"Erro ao conectar no servidor MySQL: '{err}'")
     return connection
 
+# Criar banco de dados
+def create_database(connection, database_name):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database_name}")
+        print(f"Banco de dados '{database_name}' criado (ou já existia).")
+    except Error as err:
+        print(f"Erro ao criar banco de dados: '{err}'")
+
+# Dropar banco de dados
+def drop_database(connection, database_name):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(f"DROP DATABASE IF EXISTS {database_name}")
+        print(f"Banco de dados '{database_name}' removido.")
+    except Error as err:
+        print(f"Erro ao dropar banco de dados: '{err}'")
+
+# Criar conexão com banco específico
+def create_db_connection(host_name, user_name, user_password, db_name, port=3306):
+    connection = None
+    try:
+        connection = mysql.connector.connect(
+            host=host_name,
+            user=user_name,
+            passwd=user_password,
+            database=db_name,
+            port=port
+        )
+        print(f"Conexão com banco '{db_name}' bem sucedida")
+    except Error as err:
+        print(f"Erro ao conectar no banco '{db_name}': '{err}'")
+    return connection
 
 def initServerConnection():
-    return create_server_connection(host_name, user_name, pw)
+    return create_server_connection(host_name, user_name, password)
 
 def initDBConnection():
-    return create_db_connection(host_name, user_name, pw, db_name)
-    
-
-
-
-
+    return create_db_connection(host_name, user_name, password, db_name)
