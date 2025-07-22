@@ -1,0 +1,18 @@
+  GNU nano 7.2                                                 compose.yaml                                                          services:
+      db:
+        image: mysql:8.0 # Specifies the MySQL image and version
+        environment:
+          MYSQL_ROOT_PASSWORD: secret # Set a strong root password
+          MYSQL_DATABASE: db # Optional: Create a default database
+          MYSQL_USER: user # Optional: Create a default user
+          MYSQL_PASSWORD: secret # Optional: Set password for the default user
+        ports:
+          - "3306:3306" # Maps the host port 3306 to the container port 3306
+        volumes:
+          - db_data:/var/lib/mysql # Persists data in a named volume
+volumes:
+  db_data: # Defines the named volume for data persistence
+
+
+
+
